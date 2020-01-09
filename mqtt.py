@@ -18,26 +18,31 @@ SERV_UUID = ('00000000-0001-11E1-9AB4-0002A5D5C51B')
 CHAR_UUID = ('0000AACC-8e22-4541-9d4c-21edae82ed19')
 NOTI_UUID = ('00040000-0001-11E1-AC36-0002A5D5C51B')
 mapping = {
-    2048:"Dead",
-    32768:"Fall"
+    2048: "Dead",
+    4352: "Alive",
+    32768: "Fall"
 }
+
 
 def notification_handler(sender, data):
     """Simple notification handler which prints the data received."""
     global evt_list
     global queue
     eventCode = int.from_bytes(data[2:4], byteorder='little')
-    if(eventCode == 4352) : 
-        evt_list = list()
-        print("It reborns")
-        return
 
-    if(eventCode in evt_list):
+    if (eventCode == 4352):
+        if (len(evt_list) < 1):
+            return
+        evt_list = list()
+        print("Alive")
+
+    if (eventCode in evt_list):
         return
 
     evt_list.append(eventCode)
     now = str(datetime.now())
-    print("mac_addr:{0} rssi:{1} timeStamp:{2} event_code:{3} event:{4}".format(macQueue, rssiQueue, now, eventCode, mapping[eventCode]))
+    print("mac_addr:{0} rssi:{1} timeStamp:{2} event_code:{3} event:{4}".format(macQueue, rssiQueue, now, eventCode,
+                                                                                mapping[eventCode]))
 
     queue.put_nowait({'mac_addr': macQueue, 'rssi': rssiQueue, 'timestamp': now, 'event_code': eventCode})
 
@@ -63,33 +68,36 @@ async def scan(mac_addrs, queue):
                         rssiQueue = dev.rssi
 
                         evt_list = list()
-                        
+
                         flag = await client.is_connected()
                         await client.start_notify(NOTI_UUID.lower(), notification_handler)
                         while True:
                             await asyncio.sleep(3, loop=loop)
                             isConnect = await client.is_connected()
-                            if(not isConnect):
+                            if (not isConnect):
                                 break
-                            
+
                         # await client.stop_notify(NOTI_UUID.lower())
                     # del client
                 except Exception:
                     print("Error", flag)
         telapsed = loop.time() - tstart
         print('Elapsed time: %.1f' % (telapsed))
-        waitTime = 10 - telapsed  if 10 - telapsed > 0 else 0
+        waitTime = 10 - telapsed if 10 - telapsed > 0 else 0
         await asyncio.sleep(waitTime)
 
 
 def on_connect(client, userdata, flags, rc):
     print('MQTT connected')
 
+
 def on_message(client, userdata, msg):
     print(msg.payload)
 
+
 def on_disconnect(client, userdata, rc):
     print(userdata)
+
 
 async def publish(queue):
     client = mqtt.Client(client_id=id)
@@ -105,6 +113,7 @@ async def publish(queue):
         client.publish(topic, json.dumps(val), qos=1)
         await asyncio.sleep(1)
     client.loop_stop()
+
 
 if __name__ == '__main__':
     mac_addrs = ("80:E1:26:00:B4:04")
