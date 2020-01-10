@@ -80,7 +80,7 @@ async def scan(mac_addrs, queue):
                         # await client.stop_notify(NOTI_UUID.lower())
                     # del client
                 except Exception:
-                    print("Error", flag)
+                    print("Error")
         telapsed = loop.time() - tstart
         print('Elapsed time: %.1f' % (telapsed))
         waitTime = 10 - telapsed if 10 - telapsed > 0 else 0
