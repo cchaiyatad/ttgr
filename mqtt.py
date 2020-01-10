@@ -6,8 +6,8 @@ import paho.mqtt.client as mqtt
 import json
 from datetime import datetime
 
-id = 'downgun'
-topic = '/tgr2020/jan08/data/17'
+id = 'tgr_17'
+topic = '/tgr2020/track/data/17'
 macQueue = ''
 rssiQueue = 0
 
