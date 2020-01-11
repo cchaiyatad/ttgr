@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body class="container">
+
+    <head>
+        <script src="js/@tensorflow/tfjs@latest"></script>
+    </head>
+
+    <main>
+        <div>
+        <h1>Predict</h1>
+        </div>
+    </main>
+
+    <script>
+        const tf = require('@tensorflow/tfjs-node');
+        const model = await tf.loadLayersModel('//path to model');
+        var example = "";
+        var prediction = model.predict(example);
+    </script>
+
+</body>
+
+</html>
